@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>주간업무보고서 생성기</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f4ff; padding: 2rem; }
+    h1 { text-align: center; color: #2d3a8c; margin-bottom: 2rem; font-size: 1.5rem; }
+    .form-box {
+      background: white; border-radius: 12px; padding: 2rem;
+      max-width: 680px; margin: 0 auto 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    }
+    .week-row { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1rem; }
+    .day-label {
+      width: 40px; font-weight: 700; color: #4f6ef7;
+      padding-top: 0.5rem; flex-shrink: 0; font-size: 0.95rem;
+    }
+    textarea {
+      flex: 1; border: 1px solid #ddd; border-radius: 8px;
+      padding: 0.6rem 0.8rem; font-size: 0.95rem; resize: vertical;
+      min-height: 60px; font-family: inherit;
+    }
+    textarea:focus { outline: none; border-color: #4f6ef7; }
+    .section-title { font-weight: 600; color: #555; margin-bottom: 0.8rem; font-size: 0.9rem; }
+    .meta-row { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .meta-row input {
+      flex: 1; border: 1px solid #ddd; border-radius: 8px;
+      padding: 0.6rem 0.8rem; font-size: 0.95rem; min-width: 140px;
+    }
+    .meta-row input:focus { outline: none; border-color: #4f6ef7; }
+    button {
+      display: block; width: 100%; max-width: 680px; margin: 0 auto 1rem;
+      padding: 0.9rem; background: #4f6ef7; color: white;
+      border: none; border-radius: 10px; font-size: 1rem;
+      font-weight: 600; cursor: pointer;
+    }
+    button:hover { background: #3a56d4; }
+    .copy-btn {
+      background: #22c55e; max-width: 680px;
+    }
+    .copy-btn:hover { background: #16a34a; }
+    .output-box {
+      background: white; border-radius: 12px; padding: 2rem;
+      max-width: 680px; margin: 0 auto;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      white-space: pre-wrap; font-family: 'Malgun Gothic', monospace;
+      font-size: 0.95rem; line-height: 1.8; display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>📋 주간업무보고서 생성기</h1>
+
+  <div class="form-box">
+    <div class="section-title">기본 정보</div>
+    <div class="meta-row">
+      <input type="text" id="name" placeholder="이름" value="구태우" />
+      <input type="text" id="dept" placeholder="소속" value="후진항 어촌신활력" />
+      <input type="week" id="week" />
+    </div>
+  </div>
+
+  <div class="form-box">
+    <div class="section-title">일별 업무</div>
+    <div class="week-row"><div class="day-label">월</div><textarea id="mon" placeholder="월요일 업무 내용"></textarea></div>
+    <div class="week-row"><div class="day-label">화</div><textarea id="tue" placeholder="화요일 업무 내용"></textarea></div>
+    <div class="week-row"><div class="day-label">수</div><textarea id="wed" placeholder="수요일 업무 내용"></textarea></div>
+    <div class="week-row"><div class="day-label">목</div><textarea id="thu" placeholder="목요일 업무 내용"></textarea></div>
+    <div class="week-row"><div class="day-label">금</div><textarea id="fri" placeholder="금요일 업무 내용"></textarea></div>
+  </div>
+
+  <div class="form-box">
+    <div class="section-title">기타사항</div>
+    <textarea id="etc" placeholder="기타 전달사항, 특이사항 등" style="width:100%; min-height:80px;"></textarea>
+  </div>
+
+  <button onclick="generate()">보고서 생성하기</button>
+  <button class="copy-btn" onclick="copyReport()" id="copyBtn" style="display:none;">📄 보고서 복사하기</button>
+
+  <div class="output-box" id="output"></div>
+
+  <script>
+    // 오늘 주차 자동 설정
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const startOfYear = new Date(yyyy, 0, 1);
+    const weekNum = Math.ceil(((today - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
+    document.getElementById('week').value = `${yyyy}-W${String(weekNum).padStart(2, '0')}`;
+
+    function generate() {
+      const name = document.getElementById('name').value || '구태우';
+      const dept = document.getElementById('dept').value || '';
+      const weekVal = document.getElementById('week').value;
+
+      const days = {
+        '월': document.getElementById('mon').value || '-',
+        '화': document.getElementById('tue').value || '-',
+        '수': document.getElementById('wed').value || '-',
+        '목': document.getElementById('thu').value || '-',
+        '금': document.getElementById('fri').value || '-',
+      };
+      const etc = document.getElementById('etc').value || '-';
+
+      let report = '';
+      report += `━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      report += `  주간업무보고서\n`;
+      report += `━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      report += `▪ 이름: ${name}\n`;
+      report += `▪ 소속: ${dept}\n`;
+      report += `▪ 기간: ${weekVal}\n`;
+      report += `━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+      report += `【 일별 업무 】\n\n`;
+      for (const [day, content] of Object.entries(days)) {
+        report += `[${day}] ${content}\n\n`;
+      }
+      report += `━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+      report += `【 기타사항 】\n\n${etc}\n`;
+      report += `━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+
+      const box = document.getElementById('output');
+      box.textContent = report;
+      box.style.display = 'block';
+      document.getElementById('copyBtn').style.display = 'block';
+      box.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function copyReport() {
+      const text = document.getElementById('output').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('보고서가 클립보드에 복사됐어요!');
+      });
+    }
+  </script>
+</body>
+</html>
