@@ -25,11 +25,12 @@
     textarea:focus { outline: none; border-color: #4f6ef7; }
     .section-title { font-weight: 600; color: #555; margin-bottom: 0.8rem; font-size: 0.9rem; }
     .meta-row { display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
-    .meta-row input {
+    .meta-row input, .meta-row select {
       flex: 1; border: 1px solid #ddd; border-radius: 8px;
       padding: 0.6rem 0.8rem; font-size: 0.95rem; min-width: 140px;
+      background: white;
     }
-    .meta-row input:focus { outline: none; border-color: #4f6ef7; }
+    .meta-row input:focus, .meta-row select:focus { outline: none; border-color: #4f6ef7; }
     button {
       display: block; width: 100%; max-width: 680px; margin: 0 auto 1rem;
       padding: 0.9rem; background: #4f6ef7; color: white;
@@ -56,7 +57,13 @@
   <div class="form-box">
     <div class="section-title">기본 정보</div>
     <div class="meta-row">
-      <input type="text" id="name" placeholder="이름" value="구태우" />
+      <select id="name">
+        <option value="이주현">이주현</option>
+        <option value="류양선">류양선</option>
+        <option value="최은주">최은주</option>
+        <option value="구태우" selected>구태우</option>
+        <option value="이규영">이규영</option>
+      </select>
       <input type="text" id="dept" placeholder="소속" value="후진항 어촌신활력" />
       <input type="week" id="week" />
     </div>
